@@ -3,9 +3,11 @@ package com.example.musicchartapp.model
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 data class TopTracks (
-    val success: Boolean,
+    //val success: Boolean,
     val tracks: TracksWrapper
 )
 
@@ -27,10 +29,10 @@ const val BASE_URL = "https://ws.audioscrobbler.com"
 
 
 interface LastFmApi {
-    @GET("/2.0/?method=geo.getTopTracks&country=&api_key=911923a3000dd1f684d4c10bef6a9472&format=json")
+    @GET("/2.0/?method=geo.getTopTracks&api_key=911923a3000dd1f684d4c10bef6a9472&format=json")
 
     suspend fun getTopTracks(
-
+        @Query("country") country: String
     ): TopTracks
 
     companion object {

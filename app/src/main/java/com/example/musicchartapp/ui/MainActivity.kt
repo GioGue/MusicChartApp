@@ -168,6 +168,54 @@ fun TrackListItem(track: Track) {
     }
 }
 
+@Composable
+fun NavigationVideo(){
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = {
+            AppBar(
+                onNavigationIconClick = {
+                    scope.launch {
+                        scaffoldState.drawerState.open()
+                    }
+
+                }
+            )
+        },
+        drawerContent = {
+            DrawerHeader()
+            DrawerBody(
+                items = listOf(
+                    MenuItem(
+                        id = "home",
+                        title = "Home",
+                        contentDescription = "Go to home screen",
+                        icon = Icons.Default.Home
+                    ),
+                    MenuItem(
+                        id = "settings",
+                        title = "Settings",
+                        contentDescription = "Go to settings screen",
+                        icon = Icons.Default.Settings
+                    ),
+                    MenuItem(
+                        id = "help",
+                        title = "Help",
+                        contentDescription = "Go to help screen",
+                        icon = Icons.Default.Info
+                    ),
+                ),
+                onItemClick = {
+                    println("Clicked on ${it.title}")
+                }
+            )
+        }
+    ) {
+
+    }
+}
 
 
 @Composable
@@ -198,16 +246,16 @@ fun NavigationApp(navController: NavController) {
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    //var screenViewModel: ScreenViewModel = viewModel()
+    var screenViewModel: ScreenViewModel = viewModel()
     var text by remember { mutableStateOf("") }
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ){
         Text(text = "Type the name of the country:")
-        OutlinedTextField(value = text, onValueChange ={text = it} )
+        OutlinedTextField(value = screenViewModel.countryName.value, onValueChange ={ screenViewModel.countryName.value= it} )
         Button(
-            onClick = {navController.navigate("second/${text}")},
-            enabled = text.isNotEmpty()
+            onClick = {navController.navigate("second/${screenViewModel.countryName.value}")},
+            enabled = screenViewModel.countryName.value.isNotEmpty()
         ){
             Text("Search")
         }
@@ -221,7 +269,7 @@ fun SecondScreen(navController: NavController, parameter: String?){
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ){
         Text(text = "Top Chart for ")
-        TrackApp()
+        TrackApp(TopTrackViewModel(parameter!!))
         //Text(text = "Parameter from Home is $parameter")
         Button(
             onClick = {navController.navigateUp()}
@@ -267,7 +315,7 @@ fun MyNavController(navController: NavHostController) {
     ){
 
         composable(route= "Home") {
-            NavigationApp(navController2)
+            NavigationApp(navController)
         }
         composable(route = "Info"){
             InfoScreen()

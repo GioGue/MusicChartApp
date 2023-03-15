@@ -18,7 +18,7 @@ sealed interface TopTracksUIState {
     object Loading : TopTracksUIState
 }
 
-class TopTrackViewModel: ViewModel() {
+class TopTrackViewModel(country: String): ViewModel() {
 
     var tracks by mutableStateOf<List<Track>>(emptyList())
         private set
@@ -26,27 +26,25 @@ class TopTrackViewModel: ViewModel() {
     var tracksUIState by mutableStateOf<TopTracksUIState>(TopTracksUIState.Loading)
         private set
 
+    init{
+        getTracks(country)
+    }
 
-    fun getTracks() {
+    fun getTracks(country: String) {
         viewModelScope.launch {
             var lastFmApi: LastFmApi? = null
             var n = 0
 
             try {
                 lastFmApi = LastFmApi.getInstance()
-                val topTracks = lastFmApi!!.getTopTracks()
+                val topTracks = lastFmApi!!.getTopTracks(country)
                 tracks = topTracks.tracks.track
                 for (T in tracks) {
                     n = n + 1
                     T.number = n
                 }
-                if (topTracks.success) {
                     tracks = topTracks.tracks.track
                     tracksUIState = TopTracksUIState.Success
-
-                } else {
-                    tracksUIState = TopTracksUIState.Error
-                }
             } catch (e: Exception) {
                 Log.e("*******", e.message.toString())
                 tracks = emptyList()
