@@ -8,7 +8,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Black
@@ -19,10 +24,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.musicchartapp.model.MenuItem
+import com.example.musicchartapp.model.TabItem
 import com.example.musicchartapp.model.Track
 import com.example.musicchartapp.ui.theme.MusicChartAppTheme
+import com.example.musicchartapp.viewModel.MyBottomNavigation
+import com.example.musicchartapp.viewModel.ScreenViewModel
 import com.example.musicchartapp.viewModel.TopTrackViewModel
 import com.example.musicchartapp.viewModel.TopTracksUIState
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +52,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    TrackApp()
+                    //TrackApp()
+                    //NavigationExampleApp()
+                    BottomNavigationApp()
                 }
             }
         }
@@ -62,8 +81,6 @@ fun TrackListScreen(tracksViewModel: TopTrackViewModel) {
         if (tracks.isNotEmpty()) {
             TopTrackList(tracks,tracksViewModel)
         } else {
-            //Text("Loading...")
-            //CircularProgressIndicator(modifier = Modifier.fillMaxWidth())
             LoadingScreen()
 
         }
@@ -153,6 +170,110 @@ fun TrackListItem(track: Track) {
 
 
 
+@Composable
+fun NavigationApp(navController: NavController) {
+    val navController = rememberNavController()
+        NavHost(
+            navController = navController,
+            startDestination = "home",
+        ) {
+            composable(route = "home") {
+                HomeScreen(navController)
+            }
+            composable(route = "second/{parameter}",
+                arguments = listOf(
+                    navArgument("parameter") {
+                        type = NavType.StringType
+
+                    }
+                )) {
+                SecondScreen(
+                    navController,
+                    it.arguments?.getString("parameter")
+                )
+            }
+        }
+}
+
+
+@Composable
+fun HomeScreen(navController: NavController) {
+    //var screenViewModel: ScreenViewModel = viewModel()
+    var text by remember { mutableStateOf("") }
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ){
+        Text(text = "Type the name of the country:")
+        OutlinedTextField(value = text, onValueChange ={text = it} )
+        Button(
+            onClick = {navController.navigate("second/${text}")},
+            enabled = text.isNotEmpty()
+        ){
+            Text("Search")
+        }
+    }
+
+
+}
+@Composable
+fun SecondScreen(navController: NavController, parameter: String?){
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ){
+        Text(text = "Top Chart for ")
+        TrackApp()
+        //Text(text = "Parameter from Home is $parameter")
+        Button(
+            onClick = {navController.navigateUp()}
+        ){
+            Text("Back to Home")
+        }
+    }
+
+}
+
+@Composable
+fun InfoScreen() {
+    Text("Info screen")
+}
+
+@Composable
+fun BottomNavigationApp() {
+    val items = listOf(
+        TabItem("Home", Icons.Filled.Home, "Home"),
+        //TabItem("Favourites", Icons.Filled.Favorite, "Favourites"),
+        TabItem("Info", Icons.Filled.Info, "Info")
+    )
+    BasicLayout(items)
+}
+
+@Composable
+fun BasicLayout(items: List<TabItem>) {
+    val navController = rememberNavController()
+    Scaffold (
+        topBar = {TopAppBar{ Text("Top Music Chart")}},
+        content = { MyNavController(navController = navController)},
+        bottomBar = {MyBottomNavigation(items, navController)}
+    )
+}
+
+@Composable
+fun MyNavController(navController: NavHostController) {
+    val navController2 = rememberNavController()
+    NavHost(
+        navController = navController,
+        startDestination = "Home"
+
+    ){
+
+        composable(route= "Home") {
+            NavigationApp(navController2)
+        }
+        composable(route = "Info"){
+            InfoScreen()
+        }
+    }
+}
 
 
 @Composable
