@@ -1,5 +1,6 @@
 package com.example.musicchartapp.ui
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -143,7 +144,8 @@ fun TrackListItem(track: Track) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        elevation = 4.dp
+        elevation = 4.dp,
+        backgroundColor = MaterialTheme.colors.secondary
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -218,6 +220,7 @@ fun NavigationVideo(){
 }
 
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun NavigationApp(navController: NavController) {
     val navController = rememberNavController()
