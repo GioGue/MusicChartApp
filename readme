@@ -5,4 +5,4 @@ There is a bottom navigation that allow the user to navigate from homescreen to 
 The theme has a green palette to be similar to spotify.
 In the code there is my api key passed as variable in the function getTopTracks called in the view model. I've used the @Query to be aple to change
 parameters in the @GET request. You can change the api key with your own but you need to subscribe to Last.fm (free account) -> https://www.last.fm/api. 
-The name of the country has to be typed in English and in the 'Offical way' (Full name). 
+The name of the country has to be typed in English and in the 'Offical way' (Full name), for exemple: Italy, Spain, United States. 
