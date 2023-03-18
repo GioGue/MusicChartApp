@@ -1,0 +1,8 @@
+This application has the purpose of displaying data from the API of Last.FM. In particulat it wants to show the top chart of every time of a country.
+The user can type the name of a country and the app is retriving the chart with the position of the song (obtained thanks to a small logic) , the title
+of the song and the name of the artist.
+There is a bottom navigation that allow the user to navigate from homescreen to info screen.
+The theme has a green palette to be similar to spotify.
+In the code there is my api key passed as variable in the function getTopTracks called in the view model. I've used the @Query to be aple to change
+parameters in the @GET request. You can change the api key with your own but you need to subscribe to Last.fm (free account) -> https://www.last.fm/api. 
+The name of the country has to be typed in English and in the 'Offical way' (Full name). 
