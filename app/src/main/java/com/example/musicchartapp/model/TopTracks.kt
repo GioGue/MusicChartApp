@@ -27,12 +27,12 @@ data class Artist(
 
 const val BASE_URL = "https://ws.audioscrobbler.com"
 
-
 interface LastFmApi {
-    @GET("/2.0/?method=geo.getTopTracks&api_key=911923a3000dd1f684d4c10bef6a9472&format=json")
+    @GET("/2.0/?method=geo.getTopTracks&format=json")
 
     suspend fun getTopTracks(
-        @Query("country") country: String
+        @Query("country") country: String,
+        @Query("api_key") apy_key: String
     ): TopTracks
 
     companion object {

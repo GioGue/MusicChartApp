@@ -26,6 +26,10 @@ class TopTrackViewModel(country: String): ViewModel() {
     var tracksUIState by mutableStateOf<TopTracksUIState>(TopTracksUIState.Loading)
         private set
 
+    var nameOfCountry: String = ""
+
+    var apiKey = "911923a3000dd1f684d4c10bef6a9472"
+
     init{
         getTracks(country)
     }
@@ -37,7 +41,8 @@ class TopTrackViewModel(country: String): ViewModel() {
 
             try {
                 lastFmApi = LastFmApi.getInstance()
-                val topTracks = lastFmApi!!.getTopTracks(country)
+                val topTracks = lastFmApi!!.getTopTracks(country = country, apy_key = apiKey)
+                nameOfCountry = country
                 tracks = topTracks.tracks.track
                 for (T in tracks) {
                     n = n + 1
@@ -46,7 +51,7 @@ class TopTrackViewModel(country: String): ViewModel() {
                     tracks = topTracks.tracks.track
                     tracksUIState = TopTracksUIState.Success
             } catch (e: Exception) {
-                Log.e("*******", e.message.toString())
+                //Log.e("*******", e.message.toString())
                 tracks = emptyList()
                 tracksUIState = TopTracksUIState.Error
 

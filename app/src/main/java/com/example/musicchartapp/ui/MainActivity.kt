@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -18,8 +19,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.Black
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,6 +36,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.musicchartapp.R
 import com.example.musicchartapp.model.MenuItem
 import com.example.musicchartapp.model.TabItem
 import com.example.musicchartapp.model.Track
@@ -53,13 +58,20 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    //TrackApp()
-                    //NavigationExampleApp()
                     BottomNavigationApp()
                 }
             }
         }
     }
+}
+
+@Composable
+fun BottomNavigationApp() {
+    val items = listOf(
+        TabItem("Home", Icons.Filled.Home, "Home"),
+        TabItem("Info", Icons.Filled.Info, "Info")
+    )
+    BasicLayout(items)
 }
 
 @Composable
@@ -77,10 +89,12 @@ fun TrackApp(tracksViewModel: TopTrackViewModel = viewModel()){
 fun TrackListScreen(tracksViewModel: TopTrackViewModel) {
     val tracks = tracksViewModel.tracks
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Top Tracks") }) }
+        // ${tracksViewModel.nameOfCountry}
+        // "Top Tracks of ${tracksViewModel.nameOfCountry}"
+        topBar = { TopAppBar(title = { Text(text = stringResource(R.string.Top_Bar_Title, tracksViewModel.nameOfCountry)) }) }
     ) {
         if (tracks.isNotEmpty()) {
-            TopTrackList(tracks,tracksViewModel)
+            TopTrackList(tracks)
         } else {
             LoadingScreen()
 
@@ -109,10 +123,9 @@ fun LoadingScreen() {
                     strokeWidth = 4.dp,
                     color = MaterialTheme.colors.primary
                 )
-                //Spacer(modifier = Modifier.height(padding))
                 Spacer(modifier = Modifier.height(110.dp))
                 Text(
-                    text = "Loading...",
+                    text = stringResource(R.string.LoadingText),
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 24.sp
                 )
@@ -123,19 +136,17 @@ fun LoadingScreen() {
 
 @Composable
 fun ErrorScreen() {
-    Text("Error retrieving tracks. TopChart selecter can not be used.")
+    Text(stringResource(R.string.ErrorScreenText))
 }
 
 @Composable
-fun TopTrackList(tracks: List<Track>, tracksViewModel: TopTrackViewModel = viewModel()){
+fun TopTrackList(tracks: List<Track>){
     LazyColumn {
         items(tracks) { track ->
             TrackListItem(track)
         }
     }
 }
-
-
 
 
 @Composable
@@ -152,13 +163,16 @@ fun TrackListItem(track: Track) {
         ) {
             Text(
                 text = track.number.toString(),
+                fontSize = 16.sp,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.h5
+                style = MaterialTheme.typography.h5,
+                fontWeight = SemiBold
             )
             Text(
                 text = track.name,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.h5
+                style = MaterialTheme.typography.h5,
+                fontWeight = SemiBold
             )
             Text(
                 text = track.artist.name,
@@ -167,55 +181,6 @@ fun TrackListItem(track: Track) {
 
             )
         }
-    }
-}
-
-@Composable
-fun NavigationVideo(){
-    val scaffoldState = rememberScaffoldState()
-    val scope = rememberCoroutineScope()
-    Scaffold(
-        scaffoldState = scaffoldState,
-        topBar = {
-            AppBar(
-                onNavigationIconClick = {
-                    scope.launch {
-                        scaffoldState.drawerState.open()
-                    }
-
-                }
-            )
-        },
-        drawerContent = {
-            DrawerHeader()
-            DrawerBody(
-                items = listOf(
-                    MenuItem(
-                        id = "home",
-                        title = "Home",
-                        contentDescription = "Go to home screen",
-                        icon = Icons.Default.Home
-                    ),
-                    MenuItem(
-                        id = "settings",
-                        title = "Settings",
-                        contentDescription = "Go to settings screen",
-                        icon = Icons.Default.Settings
-                    ),
-                    MenuItem(
-                        id = "help",
-                        title = "Help",
-                        contentDescription = "Go to help screen",
-                        icon = Icons.Default.Info
-                    ),
-                ),
-                onItemClick = {
-                    println("Clicked on ${it.title}")
-                }
-            )
-        }
-    ) {
-
     }
 }
 
@@ -250,17 +215,21 @@ fun NavigationApp(navController: NavController) {
 @Composable
 fun HomeScreen(navController: NavController) {
     var screenViewModel: ScreenViewModel = viewModel()
-    var text by remember { mutableStateOf("") }
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ){
-        Text(text = "Type the name of the country:")
-        OutlinedTextField(value = screenViewModel.countryName.value, onValueChange ={ screenViewModel.countryName.value= it} )
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField( modifier = Modifier.fillMaxWidth() ,
+            value = screenViewModel.countryName.value,
+            onValueChange ={ screenViewModel.countryName.value= it},
+            label = {Text(modifier = Modifier.fillMaxWidth(), text= stringResource(R.string.Type_Country_Name))},
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+        )
         Button(
             onClick = {navController.navigate("second/${screenViewModel.countryName.value}")},
             enabled = screenViewModel.countryName.value.isNotEmpty()
         ){
-            Text("Search")
+            Text(stringResource(R.string.Search_button))
         }
     }
 
@@ -271,13 +240,11 @@ fun SecondScreen(navController: NavController, parameter: String?){
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ){
-        Text(text = "Top Chart for ")
         TrackApp(TopTrackViewModel(parameter!!))
-        //Text(text = "Parameter from Home is $parameter")
         Button(
             onClick = {navController.navigateUp()}
         ){
-            Text("Back to Home")
+            Text(stringResource(R.string.Back_home_button))
         }
     }
 
@@ -285,24 +252,22 @@ fun SecondScreen(navController: NavController, parameter: String?){
 
 @Composable
 fun InfoScreen() {
-    Text("Info screen")
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    )
+    {
+        Text(stringResource(R.string.Info))
+        Text(stringResource(R.string.Info_text))
+        Text(stringResource(R.string.Author_app_name))
+    }
 }
 
-@Composable
-fun BottomNavigationApp() {
-    val items = listOf(
-        TabItem("Home", Icons.Filled.Home, "Home"),
-        //TabItem("Favourites", Icons.Filled.Favorite, "Favourites"),
-        TabItem("Info", Icons.Filled.Info, "Info")
-    )
-    BasicLayout(items)
-}
 
 @Composable
 fun BasicLayout(items: List<TabItem>) {
     val navController = rememberNavController()
     Scaffold (
-        topBar = {TopAppBar{ Text("Top Music Chart")}},
+        topBar = {TopAppBar{ Text(stringResource(R.string.Title_Top_App_Bar))}},
         content = { MyNavController(navController = navController)},
         bottomBar = {MyBottomNavigation(items, navController)}
     )
@@ -310,7 +275,6 @@ fun BasicLayout(items: List<TabItem>) {
 
 @Composable
 fun MyNavController(navController: NavHostController) {
-    val navController2 = rememberNavController()
     NavHost(
         navController = navController,
         startDestination = "Home"
@@ -327,15 +291,10 @@ fun MyNavController(navController: NavHostController) {
 }
 
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     MusicChartAppTheme {
-        Greeting("Android")
+        BottomNavigationApp()
     }
 }
